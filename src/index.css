@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TRIBAL SAATHI — DESIGN SYSTEM & TOKENS
+   SCHOLAR ORBIT — DESIGN SYSTEM & TOKENS
    Unified Civic-Tech Scholarship Guidance Platform (SIH 2026)
    ========================================================================== */
 
@@ -143,9 +143,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   outline-offset: 2px;
 }
 
-/* Primary Layout Container */
+/* Primary Layout Container (Top Navigation Layout) */
 .app-container {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   width: 100%;
   background-color: var(--color-soft-cream);
@@ -157,26 +158,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   display: flex;
   flex-direction: column;
   min-width: 0;
+  width: 100%;
   max-width: 100%;
   padding-bottom: 84px; /* Space for mobile bottom bar */
 }
 
 @media (min-width: 1024px) {
   .app-main {
-    padding-bottom: 32px;
+    padding-bottom: 40px;
   }
 }
 
 .content-wrapper {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 20px 48px;
+  padding: 16px;
 }
 
 @media (min-width: 768px) {
   .content-wrapper {
     padding: 24px 32px 56px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content-wrapper {
+    padding: 28px 40px 64px;
   }
 }
 
@@ -353,19 +361,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, 
-    var(--color-terracotta) 0%, 
-    var(--color-terracotta) 20%, 
-    var(--color-deep-forest) 20%, 
-    var(--color-deep-forest) 40%, 
-    var(--color-warning) 40%, 
-    var(--color-warning) 60%, 
-    var(--color-muted-green) 60%, 
-    var(--color-muted-green) 80%,
-    var(--color-terracotta) 80%, 
-    var(--color-terracotta) 100%
-  );
-  background-size: 32px 4px;
+  background: var(--color-terracotta);
 }
 
 /* Form Controls */

@@ -110,7 +110,7 @@ export function OpportunitiesScreen() {
             fontSize: '0.82rem',
             color: 'var(--color-charcoal)'
           }}>
-            <strong>Important Guidance:</strong> Tribal Saathi computes preliminary "potential matches" based on the data you provide. Final qualification and disbursement decisions rest solely with authorized government sanctioning officers.
+            <strong>Important Guidance:</strong> Scholar Orbit computes preliminary "potential matches" based on the data you provide. Final qualification and disbursement decisions rest solely with authorized government sanctioning officers.
           </div>
 
           {/* Scheme Cards Grid */}

@@ -55,7 +55,7 @@ Once you upload it, you're 100% on track!`,
   // 4. Explain my application / Application Status
   if (q.includes('explain') || q.includes('application') || q.includes('status') || q.includes('track') || q.includes('நிலை')) {
     return {
-      text: `You have 2 active applications in Tribal Saathi:
+      text: `You have 2 active applications in Scholar Orbit:
 
 1. Post-Matric Scholarship (ID: PM-2026-001245)
 • Current Stage: Government Directorate Verification (Stage 3 of 5)
@@ -94,7 +94,7 @@ You can also explore the visual Scholarship Radar to see opportunities grouped b
 
   // Default intelligent civic-tech response
   return {
-    text: `Namaste ${student?.fullName || 'Arun'}! I am Tribal Saathi, your dedicated companion for ST scholarships. 
+    text: `Namaste ${student?.fullName || 'Arun'}! I am Scholar Orbit, your dedicated companion for ST scholarships. 
 
 I can help you understand your eligibility, guide you through missing documents like your Income Certificate, track government verification stages, and explain your DBT payment transfers.
 

@@ -208,7 +208,7 @@ export function EligibilityExplainerModal() {
                   <span>IMPORTANT STATUTORY NOTICE</span>
                 </div>
                 <p style={{ fontSize: '0.82rem', color: 'var(--color-charcoal)', margin: 0, lineHeight: 1.5 }}>
-                  "Final eligibility is determined exclusively by the concerned competent authority (Ministry of Tribal Affairs / State Welfare Directorate). Tribal Saathi provides guidance and preparatory assistance."
+                  "Final eligibility is determined exclusively by the concerned competent authority (Ministry of Tribal Affairs / State Welfare Directorate). Scholar Orbit provides guidance and preparatory assistance."
                 </p>
               </div>
 

@@ -1,4 +1,4 @@
-# TRIBAL SAATHI
+# SCHOLAR ORBIT
 ### "Your Scholarship Journey, Simplified."
 **Smart India Hackathon (SIH 2026) Prototype**
 

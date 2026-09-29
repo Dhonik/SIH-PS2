@@ -112,7 +112,7 @@ export function OnboardingScreen() {
               </div>
 
               <h1 style={{ fontSize: '1.75rem', marginBottom: '8px', color: 'var(--color-deep-forest)' }}>
-                Welcome to Tribal Saathi
+                Welcome to Scholar Orbit
               </h1>
 
               <p style={{ fontSize: '1.05rem', color: 'var(--color-muted-text)', lineHeight: 1.6, marginBottom: '28px' }}>
@@ -481,7 +481,7 @@ export function OnboardingScreen() {
               </h2>
 
               <p style={{ fontSize: '1rem', color: 'var(--color-muted-text)', lineHeight: 1.5, marginBottom: '24px' }}>
-                Tribal Saathi identified <strong style={{ color: 'var(--color-deep-forest)' }}>3 potential scholarship opportunities</strong> matching your education and demographic background.
+                Scholar Orbit identified <strong style={{ color: 'var(--color-deep-forest)' }}>3 potential scholarship opportunities</strong> matching your education and demographic background.
               </p>
 
               <div style={{

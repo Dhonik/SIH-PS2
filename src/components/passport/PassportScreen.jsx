@@ -89,7 +89,7 @@ export function PassportScreen() {
             </div>
             <div>
               <div style={{ fontSize: '0.9rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                TRIBAL SAATHI PASSPORT
+                SCHOLAR ORBIT PASSPORT
               </div>
               <div style={{ fontSize: '0.72rem', color: 'rgba(245, 239, 230, 0.75)' }}>
                 Unified Student Application Profile • Not an official Govt ID
@@ -318,7 +318,7 @@ export function PassportScreen() {
           color: 'var(--color-muted-text)',
           textAlign: 'center'
         }}>
-          Notice: This digital passport is an application guidance credential issued for the Tribal Saathi civic-tech platform. Official scholarship grant decisions are exclusively governed by State and Central ministries.
+          Notice: This digital passport is an application guidance credential issued for the Scholar Orbit civic-tech platform. Official scholarship grant decisions are exclusively governed by State and Central ministries.
         </div>
       </motion.div>
 

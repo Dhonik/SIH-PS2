@@ -158,7 +158,7 @@ export const INITIAL_APPLICATIONS = [
     academicYear: '2026-27',
     grantAmount: 38000,
     stages: [
-      { name: 'Application Submitted', completed: true, date: '12 Aug 2026', remarks: 'Submitted by student via Tribal Saathi' },
+      { name: 'Application Submitted', completed: true, date: '12 Aug 2026', remarks: 'Submitted by student via Scholar Orbit' },
       { name: 'College Verification', completed: true, date: '28 Aug 2026', remarks: 'Verified by CEG Guindy Nodal Officer' },
       { name: 'Government Verification', completed: false, current: true, date: 'In progress', remarks: 'Under scrutiny at District Welfare Directorate' },
       { name: 'Approval', completed: false, date: 'Expected 10 Oct 2026', remarks: 'Final sanction order generation' },
@@ -360,7 +360,7 @@ export const INITIAL_NOTIFICATIONS = [
 // Multilingual translations for accessibility (English, Tamil, Hindi)
 export const TRANSLATIONS = {
   en: {
-    brandName: 'Tribal Saathi',
+    brandName: 'Scholar Orbit',
     tagline: 'Your Scholarship Journey, Simplified.',
     whereAmI: 'Where am I?',
     whatToDo: 'What do I need to do?',
@@ -381,7 +381,7 @@ export const TRANSLATIONS = {
     potentialBenefit: 'Potential Benefit',
     askSaathi: 'Ask Saathi',
     navHome: 'Home',
-    navOpportunities: 'Opportunities',
+    navOpportunities: 'Explore',
     navApplications: 'Applications',
     navPassport: 'Passport',
     navDocuments: 'Documents',
@@ -389,10 +389,10 @@ export const TRANSLATIONS = {
     navAdmin: 'Officer Portal',
     navHelp: 'Help / Grievance',
     potentialMatchBadge: 'Potential match based on your profile',
-    disclaimerGovt: 'Note: Tribal Saathi is an educational civic guidance platform. Final eligibility & sanctions are determined solely by authorized government departments.'
+    disclaimerGovt: 'Note: Scholar Orbit is an educational civic guidance platform. Final eligibility & sanctions are determined solely by authorized government departments.'
   },
   ta: {
-    brandName: 'ட்ரைபல் சாதி (Tribal Saathi)',
+    brandName: 'ஸ்காலர் ஆர்பிட் (Scholar Orbit)',
     tagline: 'உங்கள் கல்வி உதவித்தொகை பயணம், எளிதாக.',
     whereAmI: 'நான் எங்கே இருக்கிறேன்?',
     whatToDo: 'நான் என்ன செய்ய வேண்டும்?',
@@ -424,7 +424,7 @@ export const TRANSLATIONS = {
     disclaimerGovt: 'குறிப்பு: இறுதி தகுதி மற்றும் நிதி ஒதுக்கீடுகளை அரசுத் துறைகளே தீர்மானிக்கும்.'
   },
   hi: {
-    brandName: 'ट्राइबल साथी (Tribal Saathi)',
+    brandName: 'स्कॉलर ऑर्बिट (Scholar Orbit)',
     tagline: 'आपकी छात्रवृत्ति यात्रा, सरल और सुगम।',
     whereAmI: 'मैं कहाँ हूँ?',
     whatToDo: 'मुझे क्या करना है?',

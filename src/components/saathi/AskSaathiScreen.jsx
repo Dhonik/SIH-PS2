@@ -33,7 +33,7 @@ export function AskSaathiScreen() {
     {
       id: 'm-init',
       sender: 'saathi',
-      text: `Namaste ${studentProfile.fullName.split(' ')[0]}! 👋 I am your Tribal Saathi assistant. How can I guide your scholarship journey today?`,
+      text: `Namaste ${studentProfile.fullName.split(' ')[0]}! 👋 I am your Scholar Orbit assistant. How can I guide your scholarship journey today?`,
       time: 'Just now',
       followUps: ['🧭 What should I do next?', '📄 Which documents do I need?', '💰 Where is my payment?', '📋 Explain my application']
     }
@@ -132,7 +132,7 @@ export function AskSaathiScreen() {
         </div>
 
         <button
-          onClick={() => speakText(messages[messages.length - 1]?.text || 'Welcome to Tribal Saathi')}
+          onClick={() => speakText(messages[messages.length - 1]?.text || 'Welcome to Scholar Orbit')}
           className="btn-ghost"
           style={{ fontSize: '0.82rem', border: '1px solid var(--color-border)' }}
         >

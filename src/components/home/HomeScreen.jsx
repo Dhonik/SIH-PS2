@@ -100,13 +100,14 @@ export function HomeScreen() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="card tribal-accent-border"
+          className="card"
           style={{
-            backgroundColor: 'var(--color-warm-sand-light)',
-            border: '2px solid var(--color-warning)',
+            backgroundColor: 'var(--color-pure-white)',
+            border: '1px solid var(--color-border)',
+            borderTop: '4px solid var(--color-warning)',
             padding: '24px 22px',
             marginBottom: '28px',
-            boxShadow: 'var(--shadow-md)'
+            boxShadow: 'var(--shadow-sm)'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>

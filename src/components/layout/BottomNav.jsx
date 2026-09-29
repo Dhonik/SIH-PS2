@@ -10,17 +10,26 @@ import {
 } from 'lucide-react';
 
 export function BottomNav() {
-  const { activeTab, setActiveTab, t, documents } = useApp();
+  const { activeTab, setActiveTab, t, documents, userRole } = useApp();
 
+  const isOfficer = userRole === 'officer';
   const hasActionDoc = documents.some(d => d.isActionRequired);
 
-  const navItems = [
-    { id: 'home', label: t.navHome, icon: Home },
-    { id: 'opportunities', label: t.navOpportunities, icon: Compass },
-    { id: 'applications', label: t.navApplications, icon: FileText },
-    { id: 'passport', label: t.navPassport, icon: Award },
-    { id: 'documents', label: t.navDocuments, icon: FolderOpen, badge: hasActionDoc }
+  const studentNavItems = [
+    { id: 'home', label: t.navHome || 'Home', icon: Home },
+    { id: 'opportunities', label: t.navOpportunities || 'Explore', icon: Compass },
+    { id: 'applications', label: t.navApplications || 'Applications', icon: FileText },
+    { id: 'passport', label: t.navPassport || 'Passport', icon: Award }
   ];
+
+  const officerNavItems = [
+    { id: 'home', label: 'Dashboard', icon: Home },
+    { id: 'opportunities', label: 'Schemes', icon: Compass },
+    { id: 'applications', label: 'Applications', icon: FileText },
+    { id: 'passport', label: 'Students', icon: Award }
+  ];
+
+  const navItems = isOfficer ? officerNavItems : studentNavItems;
 
   return (
     <>
@@ -49,7 +58,7 @@ export function BottomNav() {
         aria-label="Ask Saathi AI Assistant"
       >
         <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>💬</span>
-        <span>{t.askSaathi}</span>
+        <span>{isOfficer ? 'Officer Copilot' : t.askSaathi}</span>
       </button>
 
       {/* Mobile Bottom Navigation Bar (Visible on < 1024px screens) */}
