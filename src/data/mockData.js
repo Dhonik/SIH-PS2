@@ -381,7 +381,7 @@ export const TRANSLATIONS = {
     potentialBenefit: 'Potential Benefit',
     askSaathi: 'Ask Saathi',
     navHome: 'Home',
-    navOpportunities: 'Explore',
+    navOpportunities: 'Opportunities',
     navApplications: 'Applications',
     navPassport: 'Passport',
     navDocuments: 'Documents',

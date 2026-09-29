@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp, parseRouteFromLocation } from './context/AppContext';
 import { useAuth } from './context/AuthContext';
 import { Header } from './components/layout/Header';
+import { Sidebar } from './components/layout/Sidebar';
 import { BottomNav } from './components/layout/BottomNav';
 
 // Public & Auth Screens
@@ -22,7 +23,6 @@ import { MoneyJourneyScreen } from './components/money/MoneyJourneyScreen';
 import { FamilyTreeScreen } from './components/family/FamilyTreeScreen';
 import { AskSaathiScreen } from './components/saathi/AskSaathiScreen';
 import { GrievanceScreen } from './components/grievance/GrievanceScreen';
-import { StudentSettings } from './components/student/StudentSettings';
 
 // Dedicated Officer Workspaces
 import { OfficerDashboard } from './components/admin/OfficerDashboard';
@@ -42,9 +42,9 @@ import { ApplicationFlowModal } from './components/applications/ApplicationFlowM
 
 export function AppContent() {
   const { isAuthenticated, role: authRole } = useAuth();
-  const { 
-    hasCompletedOnboarding, 
-    activeTab, 
+  const {
+    hasCompletedOnboarding,
+    activeTab,
     setActiveTab,
     userRole,
     setUserRole,
@@ -173,13 +173,11 @@ export function AppContent() {
         case 'dashboard':
           return <OfficerDashboard />;
         case 'opportunities':
-        case 'schemes':
         case 'scholarships':
           return <OfficerSchemes />;
         case 'applications':
           return <OfficerApplications />;
         case 'passport':
-        case 'students':
           return <OfficerPassportSearch />;
         case 'documents':
           return <OfficerDocVerification />;
@@ -207,7 +205,6 @@ export function AppContent() {
       case 'dashboard':
         return <HomeScreen />;
       case 'opportunities':
-      case 'explore':
         return <OpportunitiesScreen />;
       case 'applications':
         return <ApplicationTrackerScreen />;
@@ -224,20 +221,19 @@ export function AppContent() {
         return <AskSaathiScreen />;
       case 'grievance':
         return <GrievanceScreen />;
-      case 'settings':
-        return <StudentSettings />;
       default:
         return <HomeScreen />;
     }
   };
 
   return (
-    <div className="app-container" style={{ display: 'flex', flexDirection: 'column' }}>
-      {/* Fixed Sticky Top Navigation Header */}
-      <Header />
+    <div className="app-container">
+      {/* Desktop Sidebar (hidden on mobile) */}
+      <Sidebar />
 
-      {/* Main Content Area expanding naturally into full horizontal space */}
-      <div className="app-main" style={{ width: '100%' }}>
+      {/* Main Content Area */}
+      <div className="app-main">
+        <Header />
         <main className="content-wrapper" role="main">
           {renderActiveScreen()}
         </main>

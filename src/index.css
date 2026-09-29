@@ -8,7 +8,7 @@
   --color-deep-forest: #123B32;
   --color-deep-forest-light: #1A4D42;
   --color-deep-forest-dark: #0A241E;
-  
+
   --color-terracotta: #C96B4B;
   --color-terracotta-light: #DF8465;
   --color-terracotta-dark: #A95234;
@@ -83,12 +83,22 @@ body.high-contrast {
 }
 
 /* Text Size Scaler Classes */
-body.font-sm { --font-scale: 0.9; }
-body.font-md { --font-scale: 1; }
-body.font-lg { --font-scale: 1.15; }
+body.font-sm {
+  --font-scale: 0.9;
+}
+
+body.font-md {
+  --font-scale: 1;
+}
+
+body.font-lg {
+  --font-scale: 1.15;
+}
 
 /* Base Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -112,7 +122,12 @@ body {
 }
 
 /* Typography styles */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   color: var(--color-deep-forest);
@@ -120,10 +135,21 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-h1 { font-size: 1.85rem; }
-h2 { font-size: 1.45rem; }
-h3 { font-size: 1.2rem; }
-h4 { font-size: 1.05rem; }
+h1 {
+  font-size: 1.85rem;
+}
+
+h2 {
+  font-size: 1.45rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+h4 {
+  font-size: 1.05rem;
+}
 
 p {
   color: var(--color-muted-text);
@@ -138,15 +164,18 @@ button {
   transition: all var(--transition-fast);
 }
 
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--color-terracotta);
   outline-offset: 2px;
 }
 
-/* Primary Layout Container (Top Navigation Layout) */
+/* Primary Layout Container */
 .app-container {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
   width: 100%;
   background-color: var(--color-soft-cream);
@@ -158,33 +187,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   display: flex;
   flex-direction: column;
   min-width: 0;
-  width: 100%;
   max-width: 100%;
-  padding-bottom: 84px; /* Space for mobile bottom bar */
+  padding-bottom: 84px;
+  /* Space for mobile bottom bar */
 }
 
 @media (min-width: 1024px) {
   .app-main {
-    padding-bottom: 40px;
+    padding-bottom: 32px;
   }
 }
 
 .content-wrapper {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 16px 20px 48px;
 }
 
 @media (min-width: 768px) {
   .content-wrapper {
     padding: 24px 32px 56px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .content-wrapper {
-    padding: 28px 40px 64px;
   }
 }
 
@@ -299,7 +322,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card-forest h1, .card-forest h2, .card-forest h3, .card-forest h4 {
+.card-forest h1,
+.card-forest h2,
+.card-forest h3,
+.card-forest h4 {
   color: #FFFFFF;
 }
 
@@ -390,7 +416,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   text-decoration: underline;
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input,
+.form-select,
+.form-textarea {
   width: 100%;
   padding: 13px 15px;
   font-size: 1rem;
@@ -402,7 +430,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   transition: all var(--transition-fast);
 }
 
-.form-input:focus, .form-select:focus, .form-textarea:focus {
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
   border-color: var(--color-deep-forest);
   box-shadow: 0 0 0 3px rgba(18, 59, 50, 0.1);
   outline: none;
@@ -410,8 +440,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Animations */
 @keyframes pulseSubtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.03); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
 }
 
 .animate-pulse-subtle {
@@ -445,10 +484,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 @media (min-width: 1024px) {
+
   .bottom-nav-mobile,
   .floating-saathi-btn {
     display: none !important;
   }
+
   .desktop-sidebar {
     display: flex !important;
   }

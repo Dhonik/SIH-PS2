@@ -41,11 +41,9 @@ export const parseRouteFromLocation = () => {
     const tabMap = {
       dashboard: 'home',
       home: 'home',
-      schemes: 'opportunities',
       scholarships: 'opportunities',
       opportunities: 'opportunities',
       applications: 'applications',
-      students: 'passport',
       passport: 'passport',
       documents: 'documents',
       disbursements: 'money',
@@ -66,7 +64,6 @@ export const parseRouteFromLocation = () => {
     const tabMap = {
       dashboard: 'home',
       home: 'home',
-      explore: 'opportunities',
       opportunities: 'opportunities',
       applications: 'applications',
       passport: 'passport',
@@ -75,8 +72,7 @@ export const parseRouteFromLocation = () => {
       family: 'family',
       assistant: 'saathi',
       saathi: 'saathi',
-      grievance: 'grievance',
-      settings: 'settings'
+      grievance: 'grievance'
     };
     return { type: 'protected', role: 'student', tab: tabMap[tab] || 'home' };
   }
@@ -158,9 +154,9 @@ export function AppProvider({ children }) {
       if (userRole === 'officer') {
         const officerTabMap = {
           home: 'dashboard',
-          opportunities: 'schemes',
+          opportunities: 'scholarships',
           applications: 'applications',
-          passport: 'students',
+          passport: 'passport',
           documents: 'documents',
           money: 'disbursements',
           family: 'family',
@@ -172,15 +168,14 @@ export function AppProvider({ children }) {
       } else {
         const studentTabMap = {
           home: 'dashboard',
-          opportunities: 'explore',
+          opportunities: 'opportunities',
           applications: 'applications',
           passport: 'passport',
           documents: 'documents',
           money: 'money',
           family: 'family',
           saathi: 'assistant',
-          grievance: 'grievance',
-          settings: 'settings'
+          grievance: 'grievance'
         };
         return studentTabMap[activeTab] || activeTab;
       }
@@ -195,15 +190,15 @@ export function AppProvider({ children }) {
     const roleTitle = userRole === 'officer' ? 'Officer Portal' : 'Student Portal';
     const sectionNames = {
       home: userRole === 'officer' ? 'Officer Dashboard' : 'Home Command Center',
-      opportunities: userRole === 'officer' ? 'Scholarship Schemes' : 'Explore Scholarships',
+      opportunities: userRole === 'officer' ? 'Scholarship Schemes' : 'Opportunities',
       applications: userRole === 'officer' ? 'Application Management' : 'Application Tracker',
-      passport: userRole === 'officer' ? 'Students & Passports' : 'Scholarship Passport',
+      passport: userRole === 'officer' ? 'Student Passport Search' : 'Scholarship Passport',
       documents: userRole === 'officer' ? 'Document Verification Center' : 'Document Vault',
       money: userRole === 'officer' ? 'Disbursement Management' : 'Money Journey',
       family: userRole === 'officer' ? 'Family Overview' : 'Family Tree',
       saathi: userRole === 'officer' ? 'Officer Assistant' : 'Ask Saathi',
       grievance: userRole === 'officer' ? 'Grievance Desk' : 'Help & Grievance',
-      settings: userRole === 'officer' ? 'Officer Settings' : 'Student Settings'
+      settings: 'Officer Settings'
     };
     document.title = `Scholar Orbit — ${sectionNames[activeTab] || roleTitle}`;
   }, [userRole, activeTab, isAuthenticated]);

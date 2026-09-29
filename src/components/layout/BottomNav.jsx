@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { 
-  Home, 
-  Compass, 
-  FileText, 
-  Award, 
+import {
+  Home,
+  Compass,
+  FileText,
+  Award,
   MessageSquareHeart,
   FolderOpen
 } from 'lucide-react';
@@ -16,17 +16,19 @@ export function BottomNav() {
   const hasActionDoc = documents.some(d => d.isActionRequired);
 
   const studentNavItems = [
-    { id: 'home', label: t.navHome || 'Home', icon: Home },
-    { id: 'opportunities', label: t.navOpportunities || 'Explore', icon: Compass },
-    { id: 'applications', label: t.navApplications || 'Applications', icon: FileText },
-    { id: 'passport', label: t.navPassport || 'Passport', icon: Award }
+    { id: 'home', label: t.navHome, icon: Home },
+    { id: 'opportunities', label: t.navOpportunities, icon: Compass },
+    { id: 'applications', label: t.navApplications, icon: FileText },
+    { id: 'passport', label: t.navPassport, icon: Award },
+    { id: 'documents', label: t.navDocuments, icon: FolderOpen, badge: hasActionDoc }
   ];
 
   const officerNavItems = [
     { id: 'home', label: 'Dashboard', icon: Home },
     { id: 'opportunities', label: 'Schemes', icon: Compass },
-    { id: 'applications', label: 'Applications', icon: FileText },
-    { id: 'passport', label: 'Students', icon: Award }
+    { id: 'applications', label: 'Scrutiny', icon: FileText, badge: true },
+    { id: 'passport', label: 'Passport', icon: Award },
+    { id: 'documents', label: 'Verification', icon: FolderOpen, badge: true }
   ];
 
   const navItems = isOfficer ? officerNavItems : studentNavItems;
