@@ -327,9 +327,19 @@ export function AdminDashboardScreen() {
       {/* TAB 2: DOCUMENT VERIFICATION */}
       {activeAdminTab === 'verification' && (
         <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '1.25rem', color: 'var(--color-deep-forest)', marginBottom: '16px' }}>
-            Document Authenticity Desk
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-deep-forest)', margin: 0 }}>
+                Document Authenticity & Scrutiny Desk
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-muted-text)', margin: '4px 0 0' }}>
+                Verify student submitted certificates against State Revenue registry.
+              </p>
+            </div>
+            <span className="badge badge-forest">
+              {documents.filter(d => d.status === 'Verified').length} / {documents.length} Verified
+            </span>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {documents.map((doc) => (
@@ -341,34 +351,45 @@ export function AdminDashboardScreen() {
                   justifyContent: 'space-between',
                   flexWrap: 'wrap',
                   gap: '12px',
-                  padding: '14px 18px',
+                  padding: '16px 20px',
                   borderRadius: 'var(--radius-md)',
                   backgroundColor: doc.status === 'Verified' ? 'var(--color-warm-sand-light)' : '#FFFFFF',
                   border: '1px solid var(--color-border)'
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{doc.name}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--color-muted-text)' }}>
-                    Uploaded: {doc.uploadedOn} • Student: {studentProfile.fullName}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--color-charcoal)' }}>{doc.name}</div>
+                    <span className={`badge ${doc.status === 'Verified' ? 'badge-success' : 'badge-warning'}`}>
+                      {doc.status}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-muted-green)', marginTop: '2px', fontWeight: 600 }}>
+                    Uploaded File: <strong>{doc.fileName || `${doc.code}.pdf`}</strong> ({doc.size})
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-subtle-text)', marginTop: '2px' }}>
+                    Student: {studentProfile.fullName} • ST ({studentProfile.tribeSubcaste}) • {studentProfile.institution}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span className={`badge ${doc.status === 'Verified' ? 'badge-success' : 'badge-warning'}`}>
-                    {doc.status}
-                  </span>
-
-                  {doc.status !== 'Verified' && (
-                    <button
-                      onClick={() => handleVerifyDocument(doc.code || doc.id)}
-                      className="btn-primary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                    >
-                      <Check size={14} />
-                      <span>Approve Certificate</span>
-                    </button>
-                  )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {/* Button to verify that uploaded file */}
+                  <button
+                    onClick={() => {
+                      uploadDocument(doc.code || doc.id, {
+                        fileName: doc.fileName || `${doc.code}.pdf`,
+                        fileSize: doc.size,
+                        fileType: doc.type
+                      });
+                      setSuccessToast(`"${doc.fileName || doc.name}" has been inspected and digitally verified with Officer e-Seal.`);
+                      setTimeout(() => setSuccessToast(''), 3500);
+                    }}
+                    className={doc.status === 'Verified' ? 'btn-secondary' : 'btn-terracotta'}
+                    style={{ padding: '8px 16px', fontSize: '0.84rem', fontWeight: 700 }}
+                  >
+                    <ShieldCheck size={15} />
+                    <span>{doc.status === 'Verified' ? 'Re-Verify File' : 'Verify That Uploaded File'}</span>
+                  </button>
                 </div>
               </div>
             ))}

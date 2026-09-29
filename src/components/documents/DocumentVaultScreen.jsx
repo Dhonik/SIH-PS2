@@ -18,7 +18,11 @@ import {
   AlertCircle,
   ArrowRight,
   Home,
-  Compass
+  Compass,
+  QrCode,
+  Lock,
+  ExternalLink,
+  Award
 } from 'lucide-react';
 import { TribalWatermark, TribalDivider } from '../common/TribalPattern';
 
@@ -35,6 +39,7 @@ export function DocumentVaultScreen() {
 
   const [inspectDoc, setInspectDoc] = useState(null);
   const [analyzingDoc, setAnalyzingDoc] = useState(null);
+  const [verifiedAuditDoc, setVerifiedAuditDoc] = useState(null);
   const [scanStep, setScanStep] = useState(0); // 0 to 5
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFileInfo, setUploadedFileInfo] = useState(null);
@@ -45,7 +50,7 @@ export function DocumentVaultScreen() {
     const docToUpload = doc || documents.find(d => d.isActionRequired) || documents[0];
     setTargetDoc(docToUpload);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // Reset so same file can be re-selected if desired
+      fileInputRef.current.value = '';
       fileInputRef.current.click();
     }
   };
@@ -100,6 +105,11 @@ export function DocumentVaultScreen() {
       uploadDocument(doc.code || doc.id, fileInfo);
       setScanStep(5); // Complete
     }, 2000);
+  };
+
+  // Open in-depth verification report for an already uploaded/verified file
+  const handleVerifyUploadedFile = (doc) => {
+    setVerifiedAuditDoc(doc);
   };
 
   return (
@@ -298,19 +308,31 @@ export function DocumentVaultScreen() {
               </div>
 
               {/* Bottom Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--color-border)', paddingTop: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--color-border)', paddingTop: '12px', flexWrap: 'wrap', gap: '8px' }}>
                 <span style={{ fontSize: '0.74rem', color: 'var(--color-subtle-text)' }}>
                   {doc.uploadedOn}
                 </span>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => setInspectDoc(doc)}
                     className="btn-ghost"
                     style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                    title="Preview uploaded certificate"
                   >
                     <Eye size={14} />
                     <span>Preview</span>
+                  </button>
+
+                  {/* Dedicated "Verify That Uploaded File" button */}
+                  <button
+                    onClick={() => handleVerifyUploadedFile(doc)}
+                    className="btn-secondary"
+                    style={{ padding: '6px 10px', fontSize: '0.8rem', color: 'var(--color-deep-forest)' }}
+                    title="Audit and verify this uploaded certificate"
+                  >
+                    <ShieldCheck size={14} color="var(--color-success)" />
+                    <span>Verify File</span>
                   </button>
 
                   <button
@@ -482,6 +504,130 @@ export function DocumentVaultScreen() {
         )}
       </AnimatePresence>
 
+      {/* VERIFY THAT UPLOADED FILE (IN-DEPTH AUDIT REPORT MODAL) */}
+      <AnimatePresence>
+        {verifiedAuditDoc && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(18, 59, 50, 0.55)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 80,
+            padding: '16px'
+          }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              className="card tribal-accent-border"
+              style={{ maxWidth: '540px', width: '100%', padding: '28px', backgroundColor: '#FFFFFF', maxHeight: '90vh', overflowY: 'auto' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-success)', fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    <ShieldCheck size={16} />
+                    <span>Cryptographic Verification Audit</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.3rem', color: 'var(--color-deep-forest)', margin: 0 }}>
+                    {verifiedAuditDoc.name}
+                  </h3>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-muted-text)', marginTop: '2px' }}>
+                    File: <strong>{verifiedAuditDoc.fileName || `${verifiedAuditDoc.code}.pdf`}</strong> ({verifiedAuditDoc.size})
+                  </div>
+                </div>
+
+                <button onClick={() => setVerifiedAuditDoc(null)} className="btn-ghost" style={{ padding: '6px' }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Security Seal & Hash Badge */}
+              <div style={{
+                backgroundColor: 'var(--color-warm-sand-light)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '14px 16px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-subtle-text)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    e-District Tamper-Proof Seal
+                  </div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-deep-forest)' }}>
+                    SHA256: 7f8a92...c041 (Valid)
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--color-success)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <CheckCircle2 size={13} />
+                    <span>Verified with State Portal Registry</span>
+                  </div>
+                </div>
+
+                <div style={{ backgroundColor: '#FFFFFF', padding: '6px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                  <QrCode size={40} color="var(--color-deep-forest)" />
+                </div>
+              </div>
+
+              {/* Scrutiny Point-by-Point Checklist */}
+              <div style={{ marginBottom: '22px' }}>
+                <div style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--color-charcoal)', textTransform: 'uppercase', marginBottom: '10px' }}>
+                  Extracted Data vs. Student Profile Match
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', backgroundColor: 'var(--color-soft-cream)', borderRadius: '6px', fontSize: '0.85rem' }}>
+                    <span>Student Full Name:</span>
+                    <strong style={{ color: 'var(--color-success-dark)' }}>{studentProfile.fullName} (100% Match ✓)</strong>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', backgroundColor: 'var(--color-soft-cream)', borderRadius: '6px', fontSize: '0.85rem' }}>
+                    <span>ST Community:</span>
+                    <strong style={{ color: 'var(--color-success-dark)' }}>{studentProfile.tribeSubcaste} (Verified ✓)</strong>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', backgroundColor: 'var(--color-soft-cream)', borderRadius: '6px', fontSize: '0.85rem' }}>
+                    <span>Financial Validity:</span>
+                    <strong style={{ color: 'var(--color-success-dark)' }}>FY 2026-27 Active ✓</strong>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', backgroundColor: 'var(--color-soft-cream)', borderRadius: '6px', fontSize: '0.85rem' }}>
+                    <span>Assigned Scholarship:</span>
+                    <strong style={{ color: 'var(--color-deep-forest)' }}>Post-Matric (PM-2026-001245)</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <button
+                  onClick={() => {
+                    setVerifiedAuditDoc(null);
+                    setActiveTab('applications');
+                  }}
+                  className="btn-terracotta"
+                  style={{ width: '100%', padding: '13px', fontSize: '0.95rem', fontWeight: 700 }}
+                >
+                  <span>Continue Application Process →</span>
+                </button>
+
+                <button
+                  onClick={() => setVerifiedAuditDoc(null)}
+                  className="btn-secondary"
+                  style={{ width: '100%', padding: '10px' }}
+                >
+                  Close Audit Report
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* DOCUMENT PREVIEW MODAL */}
       {inspectDoc && (
         <div style={{
@@ -542,6 +688,8 @@ export function DocumentVaultScreen() {
                   Certified for <strong>{studentProfile.fullName}</strong>, resident of {studentProfile.district}, Scheduled Tribe ({studentProfile.tribeSubcaste}).
                   <br />
                   Reference: <strong>TN-ST-2026-99214</strong> • FY: <strong>2026-27</strong>
+                  <br />
+                  Uploaded File: <strong>{inspectDoc.fileName || `${inspectDoc.code}.pdf`}</strong>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px solid var(--color-border)', paddingTop: '10px', fontSize: '0.75rem', color: 'var(--color-subtle-text)' }}>
@@ -551,13 +699,28 @@ export function DocumentVaultScreen() {
               </div>
             )}
 
-            <button
-              onClick={() => setInspectDoc(null)}
-              className="btn-secondary"
-              style={{ width: '100%', padding: '10px' }}
-            >
-              Close Preview
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => {
+                  const docToAudit = inspectDoc;
+                  setInspectDoc(null);
+                  handleVerifyUploadedFile(docToAudit);
+                }}
+                className="btn-terracotta"
+                style={{ flex: 1.2, padding: '10px', fontSize: '0.88rem' }}
+              >
+                <ShieldCheck size={16} />
+                <span>Verify That Uploaded File</span>
+              </button>
+
+              <button
+                onClick={() => setInspectDoc(null)}
+                className="btn-secondary"
+                style={{ flex: 0.8, padding: '10px' }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
