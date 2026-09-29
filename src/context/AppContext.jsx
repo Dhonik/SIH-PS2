@@ -77,38 +77,86 @@ export function AppProvider({ children }) {
   // Eligibility results calculated dynamically
   const eligibilityMatches = evaluateStudentEligibility(studentProfile, scholarships);
 
-  // Upload or update document (simulates AI verification check)
-  const uploadDocument = (docCode, fileData) => {
+  // Upload or update document (with real file metadata and simulated AI verification check)
+  const uploadDocument = (docCode, fileData = {}) => {
+    const uploadedFileName = fileData.fileName || 'Income_Certificate_FY2026-27.pdf';
+    const uploadedFileSize = fileData.fileSize || '1.2 MB';
+    const uploadedFileType = fileData.fileType || 'PDF';
+    const previewUrl = fileData.previewUrl || null;
+
     setDocuments((prevDocs) =>
       prevDocs.map((doc) => {
-        if (doc.code === docCode || doc.id === docCode) {
+        if (doc.code === docCode || doc.id === docCode || (docCode === 'INCOME_CERT' && doc.code === 'INCOME_CERT')) {
           return {
             ...doc,
+            name: 'Annual Income Certificate',
+            fileName: uploadedFileName,
+            size: uploadedFileSize,
+            type: uploadedFileType,
+            previewUrl: previewUrl,
             status: 'Verified',
             isActionRequired: false,
-            uploadedOn: 'Today (AI Verified)',
+            uploadedOn: 'Today (Uploaded & Verified)',
             verifiedBy: 'AI Optical Pre-Check & e-Sanction Desk',
             verifiedDate: 'Just now',
-            remarks: 'Fresh valid certificate verified. Ready for government review.',
-            fieldsDetected: ['Valid for FY: 2026-27', 'Authority: Tahsildar e-District Portal', 'Income: ₹2,50,000 Verified']
+            remarks: `Fresh valid certificate (${uploadedFileName}) verified. Attached to Post-Matric application.`,
+            fieldsDetected: [
+              'Valid for FY: 2026-27',
+              'Authority: Tahsildar e-District Portal',
+              'Income: ₹2,50,000 Verified',
+              `File: ${uploadedFileName}`
+            ]
           };
         }
         return doc;
       })
     );
 
-    // Also update student profile completion
+    // Update Post-Matric application status now that blocking document is resolved
+    setApplications((prevApps) =>
+      prevApps.map((app) => {
+        if (app.id === 'app-post-matric-01' || app.applicationId === 'PM-2026-001245') {
+          return {
+            ...app,
+            statusHuman: 'Your renewed Income Certificate has been verified. Directorate Government Scrutiny is now actively progressing.',
+            lastUpdated: 'Just now',
+            stages: app.stages.map((stg) => {
+              if (stg.name === 'Government Verification') {
+                return { ...stg, remarks: 'Fresh income certificate verified. Scrutiny in progress.' };
+              }
+              return stg;
+            })
+          };
+        }
+        return app;
+      })
+    );
+
+    // Also update student profile completion to 100%
     setStudentProfile((prev) => ({
       ...prev,
-      profileCompletion: Math.min(100, prev.profileCompletion + 15)
+      profileCompletion: Math.min(100, prev.profileCompletion + 20)
     }));
+
+    // Add high-priority notification
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: 'Income Certificate Verified',
+        message: `${uploadedFileName} successfully verified and linked to your scholarship application.`,
+        time: 'Just now',
+        type: 'success',
+        read: false
+      },
+      ...prev
+    ]);
 
     // Trigger celebratory visual confetti
     try {
       confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.7 }
+        particleCount: 65,
+        spread: 70,
+        origin: { y: 0.65 }
       });
     } catch {
       // fallback

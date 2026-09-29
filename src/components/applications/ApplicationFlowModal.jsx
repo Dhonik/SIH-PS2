@@ -73,6 +73,24 @@ export function ApplicationFlowModal() {
     }
   };
 
+  const step4FileInputRef = React.useRef(null);
+  const [targetStep4Doc, setTargetStep4Doc] = useState(null);
+
+  const handleStep4FileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !targetStep4Doc) return;
+
+    const sizeFormatted = file.size > 1024 * 1024
+      ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+      : (file.size / 1024).toFixed(1) + ' KB';
+
+    uploadDocument(targetStep4Doc.code || targetStep4Doc.id, {
+      fileName: file.name,
+      fileSize: sizeFormatted,
+      fileType: file.type.includes('png') ? 'PNG' : file.type.includes('jpg') ? 'JPG' : 'PDF'
+    });
+  };
+
   return (
     <div style={{
       position: 'fixed',
@@ -85,6 +103,13 @@ export function ApplicationFlowModal() {
       zIndex: 60,
       padding: '16px'
     }}>
+      <input
+        type="file"
+        ref={step4FileInputRef}
+        onChange={handleStep4FileChange}
+        style={{ display: 'none' }}
+        accept=".pdf,.jpg,.jpeg,.png,.webp"
+      />
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -428,27 +453,53 @@ export function ApplicationFlowModal() {
                   Step 4: Attached Vault Documents
                 </h4>
                 <p style={{ fontSize: '0.85rem', marginBottom: '16px' }}>
-                  We automatically link verified certificates directly from your Tribal Saathi Vault.
+                  Verified certificates are automatically linked. If any certificate requires upload, you can upload it right here.
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '18px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
                   {documents.map((doc) => (
                     <div key={doc.id} style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '10px 14px',
+                      padding: '12px 14px',
                       borderRadius: 'var(--radius-sm)',
                       backgroundColor: doc.status === 'Verified' ? 'var(--color-warm-sand-light)' : 'var(--color-warning-bg)',
                       border: '1px solid var(--color-border)'
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FileCheck size={16} color={doc.status === 'Verified' ? 'var(--color-success)' : 'var(--color-warning-dark)'} />
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{doc.name}</span>
+                        <div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>{doc.name}</div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--color-subtle-text)' }}>
+                            {doc.fileName || doc.type}
+                          </div>
+                        </div>
                       </div>
-                      <span className={`badge ${doc.status === 'Verified' ? 'badge-success' : 'badge-warning'}`}>
-                        {doc.status}
-                      </span>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className={`badge ${doc.status === 'Verified' ? 'badge-success' : 'badge-warning'}`}>
+                          {doc.status}
+                        </span>
+
+                        {doc.status !== 'Verified' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTargetStep4Doc(doc);
+                              if (step4FileInputRef.current) {
+                                step4FileInputRef.current.value = '';
+                                step4FileInputRef.current.click();
+                              }
+                            }}
+                            className="btn-terracotta"
+                            style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                          >
+                            <UploadCloud size={13} />
+                            <span>Upload File</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

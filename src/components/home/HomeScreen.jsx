@@ -47,9 +47,42 @@ export function HomeScreen() {
     { id: 6, name: 'Disbursement', status: 'upcoming' } // ○
   ];
 
+  const homeFileInputRef = React.useRef(null);
+  const [homeUploadSuccess, setHomeUploadSuccess] = React.useState(null);
+
+  const handleHomeFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const sizeFormatted = file.size > 1024 * 1024
+      ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+      : (file.size / 1024).toFixed(1) + ' KB';
+
+    let typeFormatted = 'PDF';
+    if (file.type.includes('png')) typeFormatted = 'PNG';
+    else if (file.type.includes('jpeg') || file.type.includes('jpg')) typeFormatted = 'JPG';
+
+    uploadDocument('INCOME_CERT', {
+      fileName: file.name,
+      fileSize: sizeFormatted,
+      fileType: typeFormatted
+    });
+
+    setHomeUploadSuccess(file.name);
+  };
+
   return (
     <div className="home-screen" style={{ position: 'relative' }}>
       <TribalWatermark opacity={0.02} />
+
+      {/* Hidden file input for direct file upload from Home */}
+      <input
+        type="file"
+        ref={homeFileInputRef}
+        onChange={handleHomeFileSelect}
+        style={{ display: 'none' }}
+        accept=".pdf,.jpg,.jpeg,.png,.webp"
+      />
 
       {/* 1. TOP GREETING */}
       <div style={{ marginBottom: '22px' }}>
@@ -121,14 +154,19 @@ export function HomeScreen() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', alignSelf: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', alignSelf: 'center', flexWrap: 'wrap' }}>
               <button
-                onClick={simulateIncomeCertificateUpload}
+                onClick={() => {
+                  if (homeFileInputRef.current) {
+                    homeFileInputRef.current.value = '';
+                    homeFileInputRef.current.click();
+                  }
+                }}
                 className="btn-terracotta"
                 style={{ padding: '12px 22px', fontWeight: 700 }}
               >
                 <UploadCloud size={18} />
-                <span>{t.fixNowBtn}</span>
+                <span>Upload File & Fix</span>
               </button>
 
               <button
@@ -136,7 +174,7 @@ export function HomeScreen() {
                 className="btn-secondary"
                 style={{ padding: '12px 16px' }}
               >
-                <span>{t.continueBtn}</span>
+                <span>Open Document Vault</span>
               </button>
             </div>
           </div>
@@ -176,17 +214,18 @@ export function HomeScreen() {
                 {t.onTrackTitle}
               </h3>
               <p style={{ fontSize: '0.88rem', color: 'var(--color-muted-text)', margin: '2px 0 0' }}>
-                {t.onTrackDesc} (Your Income Certificate was verified and sent to the Directorate).
+                {homeUploadSuccess ? `"${homeUploadSuccess}" has been verified. ` : ''}
+                {t.onTrackDesc} (Your Income Certificate is verified. Post-Matric application is continuing).
               </p>
             </div>
           </div>
 
           <button
             onClick={() => setActiveTab('applications')}
-            className="btn-secondary"
-            style={{ padding: '9px 16px', fontSize: '0.88rem' }}
+            className="btn-terracotta"
+            style={{ padding: '11px 20px', fontSize: '0.92rem', fontWeight: 700 }}
           >
-            <span>Track Progress</span>
+            <span>Continue Application Process</span>
             <ArrowRight size={16} />
           </button>
         </motion.div>

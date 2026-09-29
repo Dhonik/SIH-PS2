@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -12,10 +12,13 @@ import {
   Camera, 
   FileText, 
   X, 
-  Sparkles,
-  ShieldCheck,
-  Check,
-  AlertCircle
+  Sparkles, 
+  ShieldCheck, 
+  Check, 
+  AlertCircle,
+  ArrowRight,
+  Home,
+  Compass
 } from 'lucide-react';
 import { TribalWatermark, TribalDivider } from '../common/TribalPattern';
 
@@ -23,32 +26,102 @@ export function DocumentVaultScreen() {
   const {
     documents,
     uploadDocument,
-    simulateIncomeCertificateUpload,
-    studentProfile
+    studentProfile,
+    setActiveTab
   } = useApp();
+
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const [inspectDoc, setInspectDoc] = useState(null);
   const [analyzingDoc, setAnalyzingDoc] = useState(null);
-  const [scanStep, setScanStep] = useState(0); // 0 to 4 for simulated analysis
+  const [scanStep, setScanStep] = useState(0); // 0 to 5
   const [dragActive, setDragActive] = useState(false);
+  const [uploadedFileInfo, setUploadedFileInfo] = useState(null);
+  const [targetDoc, setTargetDoc] = useState(null);
 
-  // Trigger simulated Document AI Pre-Check
-  const handleSimulateAnalysis = (doc) => {
+  // Trigger file selection via hidden native input
+  const triggerFileUpload = (doc) => {
+    const docToUpload = doc || documents.find(d => d.isActionRequired) || documents[0];
+    setTargetDoc(docToUpload);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Reset so same file can be re-selected if desired
+      fileInputRef.current.click();
+    }
+  };
+
+  // Trigger camera capture
+  const triggerCameraUpload = (doc) => {
+    const docToUpload = doc || documents.find(d => d.isActionRequired) || documents[0];
+    setTargetDoc(docToUpload);
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
+      cameraInputRef.current.click();
+    }
+  };
+
+  // Process chosen real file
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    processSelectedFile(file, targetDoc || documents.find(d => d.isActionRequired) || documents[0]);
+  };
+
+  // Core processing function for both file picker and drag-and-drop
+  const processSelectedFile = (file, doc) => {
+    const sizeFormatted = file.size > 1024 * 1024
+      ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+      : (file.size / 1024).toFixed(1) + ' KB';
+
+    let typeFormatted = 'PDF';
+    if (file.type.includes('png')) typeFormatted = 'PNG';
+    else if (file.type.includes('jpeg') || file.type.includes('jpg')) typeFormatted = 'JPG';
+    else if (file.name.endsWith('.pdf')) typeFormatted = 'PDF';
+
+    const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
+
+    const fileInfo = {
+      fileName: file.name,
+      fileSize: sizeFormatted,
+      fileType: typeFormatted,
+      previewUrl: previewUrl
+    };
+
+    setUploadedFileInfo(fileInfo);
     setAnalyzingDoc(doc);
     setScanStep(1);
 
+    // Run simulated optical scanner steps
     setTimeout(() => setScanStep(2), 500);
     setTimeout(() => setScanStep(3), 1000);
-    setTimeout(() => setScanStep(4), 1600);
+    setTimeout(() => setScanStep(4), 1500);
     setTimeout(() => {
-      uploadDocument(doc.code || doc.id, {});
+      uploadDocument(doc.code || doc.id, fileInfo);
       setScanStep(5); // Complete
-    }, 2200);
+    }, 2000);
   };
 
   return (
     <div className="document-vault-screen" style={{ position: 'relative' }}>
       <TribalWatermark opacity={0.02} />
+
+      {/* Hidden Native File Inputs for Real File Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+        accept=".pdf,.jpg,.jpeg,.png,.webp"
+      />
+      <input
+        type="file"
+        ref={cameraInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+        accept="image/*"
+        capture="environment"
+      />
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
@@ -63,7 +136,7 @@ export function DocumentVaultScreen() {
 
         {/* Quick Upload action */}
         <button
-          onClick={simulateIncomeCertificateUpload}
+          onClick={() => triggerFileUpload()}
           className="btn-terracotta"
           style={{ padding: '10px 18px', fontSize: '0.88rem' }}
         >
@@ -72,16 +145,20 @@ export function DocumentVaultScreen() {
         </button>
       </div>
 
-      {/* Drag & Drop Upload Zone (Interactive) */}
+      {/* Drag & Drop Upload Zone (Interactive with Native File Picker) */}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
         onDragLeave={() => setDragActive(false)}
         onDrop={(e) => {
           e.preventDefault();
           setDragActive(false);
-          const incomeDoc = documents.find(d => d.isActionRequired) || documents[0];
-          handleSimulateAnalysis(incomeDoc);
+          const droppedFile = e.dataTransfer.files?.[0];
+          if (droppedFile) {
+            const incomeDoc = documents.find(d => d.isActionRequired) || documents[0];
+            processSelectedFile(droppedFile, incomeDoc);
+          }
         }}
+        onClick={() => triggerFileUpload()}
         style={{
           border: dragActive ? '2px dashed var(--color-deep-forest)' : '2px dashed var(--color-border)',
           backgroundColor: dragActive ? 'var(--color-warm-sand)' : 'var(--color-warm-sand-light)',
@@ -91,10 +168,6 @@ export function DocumentVaultScreen() {
           marginBottom: '28px',
           transition: 'all 0.2s ease',
           cursor: 'pointer'
-        }}
-        onClick={() => {
-          const incomeDoc = documents.find(d => d.isActionRequired) || documents[0];
-          handleSimulateAnalysis(incomeDoc);
         }}
       >
         <div style={{
@@ -112,19 +185,29 @@ export function DocumentVaultScreen() {
           <UploadCloud size={26} />
         </div>
         <h4 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal)', margin: '0 0 4px' }}>
-          Drag & Drop your certificate here, or tap to browse
+          Drag & Drop your certificate here, or click to browse
         </h4>
         <p style={{ fontSize: '0.84rem', color: 'var(--color-muted-text)', margin: '0 0 14px' }}>
-          Supports PDF, JPG, PNG up to 10 MB (Income certificate, Community cert, Marksheet)
+          Select any real PDF, JPG, or PNG document from your device (Income cert, Community cert, Marksheet)
         </p>
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-          <span className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.82rem' }}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); triggerCameraUpload(); }}
+            className="btn-secondary"
+            style={{ padding: '8px 14px', fontSize: '0.82rem' }}
+          >
             <Camera size={14} /> Mobile Camera Scan
-          </span>
-          <span className="btn-primary" style={{ padding: '8px 14px', fontSize: '0.82rem' }}>
-            Upload File
-          </span>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); triggerFileUpload(); }}
+            className="btn-primary"
+            style={{ padding: '8px 14px', fontSize: '0.82rem' }}
+          >
+            <UploadCloud size={14} /> Upload File
+          </button>
         </div>
       </div>
 
@@ -133,7 +216,6 @@ export function DocumentVaultScreen() {
         {documents.map((doc) => {
           const isVerified = doc.status === 'Verified';
           const isAction = doc.status === 'Action Required';
-          const isReview = doc.status === 'Under Review';
 
           return (
             <div
@@ -168,7 +250,7 @@ export function DocumentVaultScreen() {
                         {doc.name}
                       </h4>
                       <span style={{ fontSize: '0.72rem', color: 'var(--color-subtle-text)' }}>
-                        {doc.type} • {doc.size}
+                        {doc.fileName ? `${doc.fileName} • ` : ''}{doc.type} • {doc.size}
                       </span>
                     </div>
                   </div>
@@ -231,26 +313,14 @@ export function DocumentVaultScreen() {
                     <span>Preview</span>
                   </button>
 
-                  {isAction ? (
-                    <button
-                      onClick={() => handleSimulateAnalysis(doc)}
-                      className="btn-terracotta"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem' }}
-                    >
-                      <UploadCloud size={14} />
-                      <span>Upload Renewal</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleSimulateAnalysis(doc)}
-                      className="btn-secondary"
-                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
-                      title="Run Optical Verification Pre-Check"
-                    >
-                      <Sparkles size={14} color="var(--color-terracotta)" />
-                      <span>Scan Check</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={() => triggerFileUpload(doc)}
+                    className={isAction ? 'btn-terracotta' : 'btn-secondary'}
+                    style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                  >
+                    <UploadCloud size={14} />
+                    <span>{isAction ? 'Upload Renewal' : 'Re-upload'}</span>
+                  </button>
                 </div>
               </div>
 
@@ -259,14 +329,14 @@ export function DocumentVaultScreen() {
         })}
       </div>
 
-      {/* AI DOCUMENT ANALYSIS MODAL (SIMULATED OPTICAL CHECK) */}
+      {/* AI DOCUMENT ANALYSIS MODAL (LIVE SCANNER & CONTINUATION FLOW) */}
       <AnimatePresence>
         {analyzingDoc && (
           <div style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(18, 59, 50, 0.5)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(18, 59, 50, 0.55)',
+            backdropFilter: 'blur(5px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -274,37 +344,47 @@ export function DocumentVaultScreen() {
             padding: '16px'
           }}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.93, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.93, y: 10 }}
               className="card tribal-accent-border"
-              style={{ maxWidth: '480px', width: '100%', padding: '28px', backgroundColor: '#FFFFFF' }}
+              style={{ maxWidth: '520px', width: '100%', padding: '28px', backgroundColor: '#FFFFFF' }}
             >
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{
-                  width: '54px',
-                  height: '54px',
+                  width: '58px',
+                  height: '58px',
                   borderRadius: '50%',
                   backgroundColor: scanStep === 5 ? 'var(--color-success-bg)' : 'var(--color-warm-sand)',
                   color: scanStep === 5 ? 'var(--color-success)' : 'var(--color-terracotta)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 12px'
+                  margin: '0 auto 12px',
+                  boxShadow: scanStep === 5 ? '0 0 0 6px rgba(63, 143, 101, 0.15)' : 'none'
                 }}>
-                  {scanStep === 5 ? <CheckCircle2 size={30} /> : <Sparkles size={28} className="animate-pulse-subtle" />}
+                  {scanStep === 5 ? <CheckCircle2 size={32} /> : <Sparkles size={28} className="animate-pulse-subtle" />}
                 </div>
 
-                <h3 style={{ fontSize: '1.25rem', color: 'var(--color-deep-forest)', margin: '0 0 4px' }}>
-                  DOCUMENT CHECK
+                <h3 style={{ fontSize: '1.3rem', color: 'var(--color-deep-forest)', margin: '0 0 4px' }}>
+                  {scanStep === 5 ? 'Document Verified Successfully!' : 'AI OPTICAL PRE-CHECK'}
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-muted-text)', margin: 0 }}>
-                  Pre-verification analysis for {analyzingDoc.name}
+                <p style={{ fontSize: '0.86rem', color: 'var(--color-muted-text)', margin: 0 }}>
+                  {uploadedFileInfo ? `${uploadedFileInfo.fileName} (${uploadedFileInfo.fileSize})` : `Processing ${analyzingDoc.name}`}
                 </p>
               </div>
 
               {/* Progress checklist steps */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+              <div style={{
+                backgroundColor: 'var(--color-warm-sand-light)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                marginBottom: '20px'
+              }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem' }}>
                   {scanStep >= 1 ? <Check size={18} color="var(--color-success)" strokeWidth={3} /> : <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '2px solid var(--color-border)' }} />}
                   <span>Document detected & clarity verified</span>
@@ -312,51 +392,91 @@ export function DocumentVaultScreen() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem' }}>
                   {scanStep >= 2 ? <Check size={18} color="var(--color-success)" strokeWidth={3} /> : <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '2px solid var(--color-border)' }} />}
-                  <span>Document type identified (State Revenue Certificate)</span>
+                  <span>Document type identified (State Revenue Authority Certificate)</span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem' }}>
                   {scanStep >= 3 ? <Check size={18} color="var(--color-success)" strokeWidth={3} /> : <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '2px solid var(--color-border)' }} />}
-                  <span>Name detected: {studentProfile.fullName}</span>
+                  <span>Applicant Name matched: <strong>{studentProfile.fullName}</strong></span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem' }}>
                   {scanStep >= 4 ? <Check size={18} color="var(--color-success)" strokeWidth={3} /> : <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '2px solid var(--color-border)' }} />}
-                  <span>Required fields found (FY 2026-27, Income ≤ ₹2.50L)</span>
+                  <span>Required fields validated (Valid for FY 2026-27 renewal)</span>
                 </div>
               </div>
 
+              {/* Completion Status & Unblocking Confirmation */}
               {scanStep === 5 && (
-                <div style={{
-                  backgroundColor: 'var(--color-success-bg)',
-                  border: '1px solid var(--color-success)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 16px',
-                  marginBottom: '20px',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--color-success-dark)', fontWeight: 800, textTransform: 'uppercase' }}>
-                    Status Result
-                  </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-success)' }}>
-                    READY FOR VERIFICATION
-                  </div>
-                </div>
-              )}
-
-              <div style={{ fontSize: '0.72rem', color: 'var(--color-subtle-text)', textAlign: 'center', marginBottom: '20px' }}>
-                Clearly state that actual official verification happens through authorized government welfare authorities.
-              </div>
-
-              {scanStep === 5 && (
-                <button
-                  onClick={() => setAnalyzingDoc(null)}
-                  className="btn-primary"
-                  style={{ width: '100%', padding: '12px' }}
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{
+                    backgroundColor: 'var(--color-success-bg)',
+                    border: '1.5px solid var(--color-success)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '14px 16px',
+                    marginBottom: '20px',
+                    textAlign: 'left'
+                  }}
                 >
-                  Done & Close
-                </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-success-dark)', fontWeight: 800, fontSize: '0.85rem' }}>
+                    <CheckCircle2 size={18} />
+                    <span>READY FOR VERIFICATION • UNBLOCKED</span>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--color-charcoal)', margin: '4px 0 0', lineHeight: 1.45 }}>
+                    Your Income Certificate has been verified and attached. Your <strong>Post-Matric Scholarship application</strong> is now unblocked and continuing to Government Verification!
+                  </p>
+                </motion.div>
               )}
+
+              {/* CONTINUATION BUTTONS (THE CORE REQUEST: "AFTER THAT CONTINUE THAT PROCESS") */}
+              {scanStep === 5 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <button
+                    onClick={() => {
+                      setAnalyzingDoc(null);
+                      setActiveTab('applications');
+                    }}
+                    className="btn-terracotta"
+                    style={{ width: '100%', padding: '14px', fontSize: '1rem', fontWeight: 700 }}
+                  >
+                    <span>Continue Application Process</span>
+                    <ArrowRight size={18} />
+                  </button>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <button
+                      onClick={() => {
+                        setAnalyzingDoc(null);
+                        setActiveTab('home');
+                      }}
+                      className="btn-secondary"
+                      style={{ padding: '11px', fontSize: '0.86rem' }}
+                    >
+                      <Home size={15} />
+                      <span>Command Center</span>
+                    </button>
+
+                    <button
+                      onClick={() => setAnalyzingDoc(null)}
+                      className="btn-secondary"
+                      style={{ padding: '11px', fontSize: '0.86rem' }}
+                    >
+                      <FolderOpen size={15} />
+                      <span>Stay in Vault</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', color: 'var(--color-muted-text)', fontSize: '0.82rem' }}>
+                  Running optical authenticity analysis... Please wait.
+                </div>
+              )}
+
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-subtle-text)', textAlign: 'center', marginTop: '16px' }}>
+                Official formal sanction is conducted through authorized Welfare Directorate officers.
+              </div>
             </motion.div>
           </div>
         )}
@@ -377,48 +497,59 @@ export function DocumentVaultScreen() {
         }}>
           <div className="card" style={{ maxWidth: '520px', width: '100%', padding: '24px', backgroundColor: '#FFFFFF' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '1.2rem', color: 'var(--color-deep-forest)', margin: 0 }}>
-                {inspectDoc.name}
-              </h3>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-deep-forest)', margin: 0 }}>
+                  {inspectDoc.name}
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-muted-text)' }}>
+                  {inspectDoc.fileName || `${inspectDoc.code}.pdf`} • {inspectDoc.size}
+                </span>
+              </div>
               <button onClick={() => setInspectDoc(null)} className="btn-ghost" style={{ padding: '6px' }}>
                 <X size={18} />
               </button>
             </div>
 
-            {/* Simulated certificate sheet */}
-            <div style={{
-              backgroundColor: 'var(--color-warm-sand-light)',
-              border: '2px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: '24px',
-              fontFamily: 'serif',
-              color: 'var(--color-charcoal)',
-              minHeight: '220px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              marginBottom: '16px'
-            }}>
-              <div style={{ textAlign: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '10px' }}>
-                <div style={{ fontSize: '0.8rem', letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-muted-text)' }}>
-                  Government of Tamil Nadu • e-District Portal
+            {/* Simulated certificate sheet or image preview */}
+            {inspectDoc.previewUrl ? (
+              <div style={{ marginBottom: '16px', borderRadius: 'var(--radius-md)', overflow: 'hidden', maxHeight: '300px', display: 'flex', justifyContent: 'center', backgroundColor: '#000' }}>
+                <img src={inspectDoc.previewUrl} alt={inspectDoc.name} style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }} />
+              </div>
+            ) : (
+              <div style={{
+                backgroundColor: 'var(--color-warm-sand-light)',
+                border: '2px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '24px',
+                fontFamily: 'serif',
+                color: 'var(--color-charcoal)',
+                minHeight: '200px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                marginBottom: '16px'
+              }}>
+                <div style={{ textAlign: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '10px' }}>
+                  <div style={{ fontSize: '0.8rem', letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-muted-text)' }}>
+                    Government of Tamil Nadu • e-District Portal
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--color-deep-forest)', marginTop: '4px' }}>
+                    {inspectDoc.name.toUpperCase()}
+                  </div>
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--color-deep-forest)', marginTop: '4px' }}>
-                  {inspectDoc.name.toUpperCase()}
+
+                <div style={{ margin: '14px 0', fontSize: '0.88rem', lineHeight: 1.6 }}>
+                  Certified for <strong>{studentProfile.fullName}</strong>, resident of {studentProfile.district}, Scheduled Tribe ({studentProfile.tribeSubcaste}).
+                  <br />
+                  Reference: <strong>TN-ST-2026-99214</strong> • FY: <strong>2026-27</strong>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px solid var(--color-border)', paddingTop: '10px', fontSize: '0.75rem', color: 'var(--color-subtle-text)' }}>
+                  <div>e-Governance Seal Verified</div>
+                  <div style={{ fontWeight: 'bold', color: 'var(--color-success)' }}>✓ Authenticated</div>
                 </div>
               </div>
-
-              <div style={{ margin: '14px 0', fontSize: '0.88rem', lineHeight: 1.6 }}>
-                This is to certify that <strong>{studentProfile.fullName}</strong>, resident of {studentProfile.district}, belongs to the Scheduled Tribe community ({studentProfile.tribeSubcaste}).
-                <br />
-                Verification Reference: <strong>TN-ST-2026-99214</strong>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px solid var(--color-border)', paddingTop: '10px', fontSize: '0.75rem', color: 'var(--color-subtle-text)' }}>
-                <div>Digitally Signed by Competent Officer</div>
-                <div style={{ fontWeight: 'bold', color: 'var(--color-success)' }}>✓ QR Seal Verified</div>
-              </div>
-            </div>
+            )}
 
             <button
               onClick={() => setInspectDoc(null)}
